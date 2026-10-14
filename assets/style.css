@@ -1,0 +1,861 @@
+/* ==========================================================================
+   NieR:Automata inspired introduction card — deep navy palette.
+   The layout, loading sequence, glitch text and menu interactions are all
+   CSS driven; `--boot-total` is set from Gleam to sequence the boot overlay.
+   ========================================================================== */
+
+/* -- palette + base ------------------------------------------------------- */
+
+:root {
+  --bg: #0b1726;
+  --bg-deep: #060e19;
+  --grid: #16273f;
+
+  --surface: #0f2138;
+  --surface-2: #0a1626;
+
+  --line: #24405f;
+  --line-soft: #182c46;
+
+  --ice: #dbe8f6;
+  --ice-dim: #9bb4d1;
+  --blue: #5b7ba1;
+  --blue-deep: #1b2c44;
+
+  --ink: #0b1726;
+  --text: #c6d8ee;
+  --text-dim: #8ba6c6;
+  --text-faint: #5c7796;
+
+  --accent: #cd664d;
+  --accent-2: #4f7fd6;
+
+  --glitch-bg: var(--bg);
+
+  --font: "Manrope", ui-sans-serif, system-ui, "Helvetica Neue", Arial, sans-serif;
+
+  --boot-total: 6s;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  overflow-x: hidden;
+  font-family: var(--font);
+  font-weight: 400;
+  color: var(--text);
+  background-color: var(--bg);
+  background-image:
+    linear-gradient(to right, var(--grid) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid) 1px, transparent 1px);
+  background-size: 0.3rem 0.3rem;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* -- glitch text ---------------------------------------------------------- */
+/* Recreates the tri-layer red/blue glitch used across the reference site. */
+
+.nier__glitch {
+  position: relative;
+  display: inline-block;
+  animation: glitch 1.5s infinite;
+}
+
+.nier__glitch::before,
+.nier__glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  clip: rect(0, 900px, 0, 0);
+  background: var(--glitch-bg);
+}
+
+.nier__glitch::before {
+  left: 1px;
+  text-shadow: -1px 0 var(--accent);
+  animation: glitch-before 1.5s infinite linear alternate-reverse;
+}
+
+.nier__glitch::after {
+  left: -1px;
+  text-shadow: -1px 0 var(--accent-2);
+  animation: glitch-after 1.5s infinite linear alternate-reverse;
+}
+
+@keyframes glitch {
+  0%,
+  100% {
+    transform: none;
+  }
+  10%,
+  30%,
+  50%,
+  70% {
+    transform: translate(-0.3px, 0.3px) skew(0.2deg);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translate(0.3px, -0.3px) skew(-0.2deg);
+  }
+}
+
+@keyframes glitch-before {
+  0%,
+  100% {
+    clip: rect(0, 900px, 0, 0);
+  }
+  10% {
+    clip: rect(20px, 900px, 50px, 0);
+    transform: skew(0.2deg);
+  }
+  20% {
+    clip: rect(85px, 900px, 115px, 0);
+    transform: skew(-0.2deg);
+  }
+  30% {
+    clip: rect(10px, 900px, 40px, 0);
+    transform: skew(0.2deg);
+  }
+  40% {
+    clip: rect(60px, 900px, 90px, 0);
+    transform: skew(-0.2deg);
+  }
+  50% {
+    clip: rect(25px, 900px, 55px, 0);
+    transform: skew(0.2deg);
+  }
+  60% {
+    clip: rect(90px, 900px, 120px, 0);
+    transform: skew(-0.2deg);
+  }
+  70% {
+    clip: rect(15px, 900px, 45px, 0);
+    transform: skew(0.2deg);
+  }
+  80% {
+    clip: rect(70px, 900px, 100px, 0);
+    transform: skew(-0.2deg);
+  }
+  90% {
+    clip: rect(40px, 900px, 70px, 0);
+    transform: skew(0.2deg);
+  }
+}
+
+@keyframes glitch-after {
+  0%,
+  100% {
+    clip: rect(0, 900px, 0, 0);
+  }
+  10% {
+    clip: rect(80px, 900px, 110px, 0);
+    transform: skew(-0.2deg);
+  }
+  20% {
+    clip: rect(15px, 900px, 45px, 0);
+    transform: skew(0.2deg);
+  }
+  30% {
+    clip: rect(70px, 900px, 100px, 0);
+    transform: skew(-0.2deg);
+  }
+  40% {
+    clip: rect(35px, 900px, 65px, 0);
+    transform: skew(0.2deg);
+  }
+  50% {
+    clip: rect(100px, 900px, 130px, 0);
+    transform: skew(-0.2deg);
+  }
+  60% {
+    clip: rect(20px, 900px, 50px, 0);
+    transform: skew(0.2deg);
+  }
+  70% {
+    clip: rect(85px, 900px, 115px, 0);
+    transform: skew(-0.2deg);
+  }
+  80% {
+    clip: rect(30px, 900px, 60px, 0);
+    transform: skew(0.2deg);
+  }
+  90% {
+    clip: rect(55px, 900px, 85px, 0);
+    transform: skew(-0.2deg);
+  }
+}
+
+/* ==========================================================================
+   Boot overlay
+   ========================================================================== */
+
+.nier__loader {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  padding: 2% 4% 4%;
+  color: var(--ice);
+  text-shadow: 0 0 5px rgba(198, 222, 250, 0.8);
+  background: rgba(4, 10, 18, 0.94);
+  animation: loader-out 0.6s ease var(--boot-total) forwards;
+}
+
+.nier__loader .nier__glitch {
+  --glitch-bg: #050b14;
+}
+
+.nier__emblem {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: min(52vmin, 440px);
+  height: min(52vmin, 440px);
+  background: url("emblem.svg") center center / contain no-repeat;
+  opacity: 0;
+  animation: emblem-in 2s ease 0.2s forwards;
+}
+
+.nier__loader-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.nier__loader-status {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.nier__loader-title {
+  margin: 0;
+  font-size: clamp(1.6rem, 4vw, 2.6rem);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+}
+
+.nier__loader-sys {
+  margin: 0;
+  font-size: clamp(0.8rem, 1.6vw, 1rem);
+  letter-spacing: 0.24em;
+  opacity: 0.85;
+}
+
+.nier__loader-dots {
+  display: inline-block;
+  overflow: hidden;
+  width: 0;
+  vertical-align: baseline;
+  animation: dots 1.6s steps(4, end) infinite;
+}
+
+.nier__loader-dots::after {
+  content: "...";
+}
+
+.nier__loader-logs {
+  position: relative;
+  margin-left: 2%;
+  margin-top: 1.4rem;
+  flex: 1;
+}
+
+/* each diagnostic line types itself out, then keeps glitching */
+
+.nier__log {
+  display: block;
+  margin: 0;
+  line-height: 4vh;
+  white-space: nowrap;
+  overflow: hidden;
+  clip-path: inset(0 100% 0 0);
+  animation:
+    log-type var(--dur, 0ms) steps(var(--chars, 1), end) var(--delay, 0ms) forwards,
+    glitch 1.5s infinite;
+}
+
+/* -- spinner -------------------------------------------------------------- */
+
+.nier__spinner {
+  position: relative;
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+.nier__spinner-inner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 35%;
+  height: 35%;
+  transform: translate(-50%, -50%);
+  background: var(--ice);
+  border-radius: 50%;
+}
+
+.nier__spinner-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 1;
+  width: 80%;
+  height: 80%;
+  transform: translate(-50%, -50%);
+  border: 3px solid var(--bg);
+  border-radius: 60%;
+  border-top-color: transparent;
+  border-bottom-color: transparent;
+  border-left-color: transparent;
+}
+
+.nier__spinner-outer {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 80%;
+  height: 80%;
+  transform: translate(-50%, -50%);
+  border: 6px solid var(--ice);
+  border-radius: 60%;
+}
+
+.nier__spinner-close {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  transform: translate(-50%, -50%);
+  border: 2px solid var(--ice);
+  border-radius: 60%;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes dots {
+  to {
+    width: 1.1em;
+  }
+}
+
+@keyframes log-type {
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes emblem-in {
+  to {
+    opacity: 0.09;
+  }
+}
+
+@keyframes loader-out {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+/* ==========================================================================
+   Main card
+   ========================================================================== */
+
+.nier__page {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: 2% 4% 3%;
+  opacity: 0;
+  animation: page-in 0.55s ease-out calc(var(--boot-total) - 250ms) forwards;
+}
+
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: translateX(-100px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* -- top bar / tabs ------------------------------------------------------- */
+
+.nier__topbar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: clamp(14px, 2vw, 30px);
+  padding-top: 0.4rem;
+}
+
+.nier__bar-deco {
+  display: flex;
+  flex-direction: row;
+  flex: 0 0 auto;
+}
+
+.nier__bar {
+  display: block;
+  height: 3.2rem;
+  margin-right: 5px;
+  background: var(--blue);
+}
+
+.nier__bar--wide {
+  width: 10px;
+}
+
+.nier__bar--thin {
+  width: 4px;
+  margin-right: 0;
+}
+
+.nier__bar--dark {
+  background: var(--ice);
+}
+
+.nier__tabs {
+  display: flex;
+  flex: 1 1 auto;
+  gap: clamp(8px, 1.4vw, 20px);
+}
+
+/* -- masthead ------------------------------------------------------------- */
+
+.nier__masthead {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.nier__title {
+  margin: 0;
+  color: var(--ice);
+  font-size: clamp(2rem, 5.4vw, 48px);
+  font-weight: 500;
+  letter-spacing: 8px;
+  text-shadow: 0 0 24px rgba(120, 170, 230, 0.28);
+  animation:
+    glitch 1.5s infinite,
+    title-in 0.7s steps(16, end) calc(var(--boot-total) - 120ms) backwards;
+}
+
+.nier__subtitle {
+  margin: 0;
+  color: var(--blue);
+  font-size: clamp(0.95rem, 2.2vw, 24px);
+  font-weight: 400;
+  letter-spacing: 4px;
+  animation:
+    glitch 1.5s infinite,
+    title-in 0.7s steps(20, end) calc(var(--boot-total) + 40ms) backwards;
+}
+
+@keyframes title-in {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+.nier__hr {
+  border: 0;
+  border-top: 1px solid var(--line);
+  margin: 2.2rem 0 0;
+  width: 100%;
+}
+
+.nier__dotted {
+  height: 4px;
+  width: 100%;
+  margin-top: 4px;
+  background-image: linear-gradient(to right, var(--blue) 14%, transparent 0%);
+  background-size: 80px 4px;
+  background-repeat: repeat-x;
+}
+
+/* -- content -------------------------------------------------------------- */
+
+.nier__body {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(22px, 3vw, 38px);
+  flex: 1;
+  padding: clamp(22px, 3.4vw, 40px) 0;
+}
+
+.nier__body > .nier__widget {
+  max-width: 980px;
+}
+
+/* status widget */
+
+.nier__widget {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--line-soft);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+}
+
+.nier__widget-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0.9rem 1rem;
+  background: var(--blue);
+  color: var(--ink);
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+}
+
+.nier__widget-square {
+  width: 18px;
+  height: 18px;
+  background: var(--surface-2);
+}
+
+.nier__widget-level {
+  margin-left: auto;
+  color: var(--bg);
+  font-size: 0.8rem;
+  letter-spacing: 0.18em;
+  opacity: 0.8;
+}
+
+.nier__widget-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  padding: 1.2rem;
+}
+
+.nier__summary {
+  margin: 0;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-line;
+}
+
+.nier__fields {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.nier__field {
+  display: grid;
+  grid-template-columns: minmax(110px, 40%) 1fr;
+  gap: 1rem;
+  align-items: baseline;
+  padding: 0.7rem 0;
+  border-bottom: 2px solid var(--line-soft);
+  opacity: 0;
+  animation: field-in 0.4s ease-out
+    calc(var(--boot-total) + 200ms + var(--i, 0) * 70ms) forwards;
+}
+
+@keyframes field-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.nier__field:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.nier__field-label {
+  color: var(--text-dim);
+  font-size: 0.78rem;
+  letter-spacing: 0.18em;
+}
+
+.nier__field-value {
+  margin: 0;
+  color: var(--ice);
+  letter-spacing: 0.05em;
+}
+
+.nier__field-value::before {
+  content: "▪";
+  margin-right: 0.7em;
+  color: var(--blue);
+}
+
+/* -- destination tabs ----------------------------------------------------- */
+/* The signature YoRHa hover: the bar slides from navy to ice, the icon
+   inverts, and two lines flick out above and below the item. */
+
+.nier__link {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  margin: 8px 0;
+  color: var(--ice);
+  text-decoration: none;
+  background-image: linear-gradient(
+    90deg,
+    var(--blue-deep) 50%,
+    var(--blue-deep) 50%,
+    var(--ice) 50%,
+    var(--ice) 100%
+  );
+  background-size: 200%;
+  transition: 0.2s linear;
+  outline: none;
+  opacity: 0;
+  animation: link-in 0.45s ease-out
+    calc(var(--boot-total) + 160ms + var(--i, 0) * 80ms) forwards;
+}
+
+@keyframes link-in {
+  from {
+    opacity: 0;
+    transform: translateX(-18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.nier__link:hover,
+.nier__link.is-active,
+.nier__link:focus-visible {
+  background-position: -100%;
+  color: var(--ink);
+}
+
+.nier__link::before,
+.nier__link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--ice);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.2s linear;
+}
+
+.nier__link::before {
+  top: -6px;
+}
+
+.nier__link::after {
+  bottom: -6px;
+}
+
+.nier__link:hover::before,
+.nier__link:hover::after,
+.nier__link.is-active::before,
+.nier__link.is-active::after {
+  transform: scaleX(1);
+}
+
+.nier__icon {
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  min-height: 20px;
+  background-image: linear-gradient(
+    90deg,
+    var(--ice) 50%,
+    var(--ice) 50%,
+    var(--blue-deep) 50%,
+    var(--blue-deep) 100%
+  );
+  background-size: 200%;
+  transition: 0.1s linear;
+}
+
+.nier__link:hover .nier__icon,
+.nier__link.is-active .nier__icon,
+.nier__link:focus-visible .nier__icon {
+  background-position: -100%;
+}
+
+.nier__link-label {
+  color: inherit;
+  font-size: clamp(0.82rem, 1.35vw, 1.05rem);
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* -- footer --------------------------------------------------------------- */
+
+.nier__footer {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 2rem -4% 0;
+  padding: 0.9rem 4%;
+  background: var(--surface);
+  border-top: 1px solid var(--line);
+}
+
+.nier__footer-bars {
+  display: flex;
+  flex-direction: row;
+  flex: 0 0 auto;
+}
+
+.nier__footer .nier__bar {
+  height: 2.2rem;
+}
+
+.nier__footer-text {
+  color: var(--text-dim);
+  font-size: clamp(0.85rem, 1.8vw, 1.4rem);
+  letter-spacing: 0.24em;
+}
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+
+@media (max-width: 820px) {
+  .nier__tabs {
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .nier__tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .nier__link {
+    flex: 0 0 auto;
+    padding: 12px 14px;
+  }
+
+  .nier__title {
+    letter-spacing: 4px;
+  }
+
+  .nier__log {
+    line-height: 3.2vh;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .nier__page {
+    padding: 3% 5% 4%;
+  }
+
+  .nier__loader {
+    padding: 4% 5% 5%;
+  }
+
+  .nier__widget-head,
+  .nier__widget-body {
+    padding: 0.9rem 1rem;
+  }
+
+  .nier__field {
+    grid-template-columns: 1fr;
+    gap: 0.2rem;
+  }
+
+  .nier__field-value {
+    padding-left: 0.2rem;
+  }
+}
+
+/* ==========================================================================
+   Accessibility
+   ========================================================================== */
+
+:focus-visible {
+  outline: 1px solid var(--ice);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nier__loader,
+  .nier__spinner,
+  .nier__loader-dots,
+  .nier__glitch,
+  .nier__glitch::before,
+  .nier__glitch::after,
+  .nier__log,
+  .nier__title,
+  .nier__subtitle,
+  .nier__field,
+  .nier__link {
+    animation: none !important;
+  }
+
+  .nier__loader {
+    display: none;
+  }
+
+  .nier__page,
+  .nier__field,
+  .nier__link {
+    opacity: 1;
+    transform: none;
+  }
+
+  .nier__log {
+    clip-path: none;
+  }
+
+  .nier__emblem {
+    opacity: 0.09;
+  }
+}

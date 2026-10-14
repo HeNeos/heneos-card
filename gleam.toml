@@ -1,0 +1,33 @@
+name = "introduction_card"
+version = "1.0.0"
+target = "javascript"
+
+description = "A personal introduction card styled after the NieR:Automata menu."
+licences = ["MIT"]
+
+[dependencies]
+gleam_stdlib = ">= 1.0.0 and < 2.0.0"
+lustre = ">= 5.7.1 and < 6.0.0"
+
+[dev_dependencies]
+gleeunit = ">= 1.0.0 and < 2.0.0"
+lustre_dev_tools = ">= 2.4.0 and < 3.0.0"
+
+[tools.lustre.html]
+title = "PERSONAL DATA // HENEOS"
+lang = "en"
+stylesheets = [
+  { href = "https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600&display=swap" },
+  { href = "style.css" },
+]
+links = [
+  { rel = "icon", type = "image/svg+xml", href = "favicon.svg" },
+]
+meta = [
+  { name = "description", content = "Personal data records of a software engineer. NieR:Automata inspired interface." },
+  { name = "theme-color", content = "#0b1726" },
+]
+body = '<div id="app"></div><noscript><p style="font-family:Manrope,system-ui,sans-serif;color:#c6d8ee;background:#060e19;padding:2rem;min-height:100vh;margin:0">This interface requires JavaScript to render.</p></noscript>'
+
+[tools.lustre.build]
+minify = true
