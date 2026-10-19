@@ -76,7 +76,10 @@ fn fields() -> List(#(String, String)) {
     #("SPECIALIZATION", "Backend, systems and cloud architecture"),
     #("STACK", "python, typescript, rust, idris2, gleam, elixir"),
     #("STATUS", "AVAILABLE for work"),
-    #("INTERESTS", "distributed systems, PL, cloud arch, security eng, type theory"), 
+    #(
+      "INTERESTS",
+      "distributed systems, PL, cloud arch, security eng, type theory",
+    ),
   ]
 }
 
@@ -215,17 +218,21 @@ fn init(_flags: Nil) -> #(Model, effect.Effect(Message)) {
       hold_ticks: 0,
     ),
     effect.from(fn(dispatch) {
-      start_footer_timer(footer_tick_ms, fn() {
-        dispatch(FooterAnimationTick)
-      })
+      start_footer_timer(footer_tick_ms, fn() { dispatch(FooterAnimationTick) })
     }),
   )
 }
 
 fn update(model: Model, message: Message) -> #(Model, effect.Effect(Message)) {
   case message {
-    UserHoveredDestination(index) -> #(with_selected(model, index), effect.none())
-    UserFocusedDestination(index) -> #(with_selected(model, index), effect.none())
+    UserHoveredDestination(index) -> #(
+      with_selected(model, index),
+      effect.none(),
+    )
+    UserFocusedDestination(index) -> #(
+      with_selected(model, index),
+      effect.none(),
+    )
     UserLeftDestinations -> #(with_selected(model, -1), effect.none())
     FooterAnimationTick -> #(advance_footer(model), effect.none())
   }
@@ -273,7 +280,7 @@ fn advance_footer_hold(model: Model, fact_length: Int) -> Model {
 }
 
 fn next_seed(seed: Int) -> Int {
-  positive_remainder(seed * 48271, 2147483647)
+  positive_remainder(seed * 48_271, 2_147_483_647)
 }
 
 fn positive_remainder(dividend: Int, divisor: Int) -> Int {
@@ -329,11 +336,12 @@ fn scramble_text(
 fn scrambled_character(character: String, seed: Int) -> String {
   case character == " " {
     True -> " "
-    False -> string.slice(
-      scramble_characters,
-      positive_remainder(seed, string.length(scramble_characters)),
-      1,
-    )
+    False ->
+      string.slice(
+        scramble_characters,
+        positive_remainder(seed, string.length(scramble_characters)),
+        1,
+      )
   }
 }
 

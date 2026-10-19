@@ -18,8 +18,7 @@ fn sample_model(selected: Int) -> Model {
 }
 
 pub fn view_renders_the_boot_sequence_test() {
-  let rendered =
-    introduction_card.view(sample_model(-1)) |> element.to_string
+  let rendered = introduction_card.view(sample_model(-1)) |> element.to_string
 
   assert string.contains(rendered, "LOADING")
   assert string.contains(rendered, "CHECKING SYSTEM")
@@ -28,11 +27,10 @@ pub fn view_renders_the_boot_sequence_test() {
 }
 
 pub fn view_renders_the_profile_and_destinations_test() {
-  let rendered =
-    introduction_card.view(sample_model(-1)) |> element.to_string
+  let rendered = introduction_card.view(sample_model(-1)) |> element.to_string
 
   assert string.contains(rendered, "PERSONAL DATA")
-  assert string.contains(rendered, "SOFTWARE ENGINEER")
+  assert string.contains(rendered, "Software Engineer")
   assert string.contains(rendered, "GITHUB")
   assert string.contains(rendered, "Octopuses have three hearts.")
 }
@@ -44,8 +42,7 @@ pub fn selected_destination_is_marked_active_test() {
 }
 
 pub fn glitch_layers_echo_the_text_test() {
-  let rendered =
-    introduction_card.view(sample_model(-1)) |> element.to_string
+  let rendered = introduction_card.view(sample_model(-1)) |> element.to_string
 
   assert string.contains(rendered, "data-text")
 }
