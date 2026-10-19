@@ -24,7 +24,7 @@ links = [
   { rel = "icon", type = "image/svg+xml", href = "favicon.svg" },
 ]
 meta = [
-  { name = "description", content = "Personal data records of a software engineer. NieR:Automata inspired interface." },
+  { name = "description", content = "Personal data records of HeNeos." },
   { name = "theme-color", content = "#0b1726" },
 ]
 body = '<div id="app"></div><noscript><p style="font-family:Manrope,system-ui,sans-serif;color:#c6d8ee;background:#060e19;padding:2rem;min-height:100vh;margin:0">This interface requires JavaScript to render.</p></noscript>'
