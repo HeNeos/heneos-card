@@ -11,6 +11,7 @@
 
 import gleam/int
 import gleam/list
+import gleam/result
 import gleam/string
 import lustre
 import lustre/attribute
@@ -49,31 +50,33 @@ fn destinations() -> List(Destination) {
       href: "https://github.com/HeNeos",
     ),
     Destination(
-      label: "WEBSITE",
+      label: "BLOG",
       hint: "ARTICLES & NOTES",
-      href: "https://your-website.example.com",
+      href: "https://heneos.github.io/heneos-blog",
     ),
     Destination(
       label: "LINKEDIN",
       hint: "PROFESSIONAL PROFILE",
-      href: "https://www.linkedin.com/in/your-username",
+      href: "https://www.linkedin.com/in/heneos",
     ),
     Destination(
       label: "EMAIL",
       hint: "DIRECT MESSAGE",
-      href: "mailto:you@example.com",
+      href: "mailto:heneos3.14@gmail.com",
     ),
   ]
 }
 
 /// Small facts about you, rendered as the status readout.
+/// TODO: Increase available width
 fn fields() -> List(#(String, String)) {
   [
-    #("DESIGNATION", "SOFTWARE ENGINEER"),
-    #("LOCATION", "REMOTE / EARTH"),
-    #("SPECIALIZATION", "BACKEND & SYSTEMS"),
-    #("STACK", "GLEAM · ELIXIR · RUST"),
-    #("STATUS", "AVAILABLE FOR WORK"),
+    #("DESIGNATION", "Software Engineer"),
+    #("LOCATION", "EARTH |> near to IRELAND"),
+    #("SPECIALIZATION", "Backend, systems and cloud architecture"),
+    #("STACK", "python, typescript, rust, idris2, gleam, elixir"),
+    #("STATUS", "AVAILABLE for work"),
+    #("INTERESTS", "distributed systems, PL, cloud arch, security eng, type theory"), 
   ]
 }
 
@@ -104,17 +107,34 @@ fn loading_messages() -> List(String) {
 
 const document_title = "PERSONAL DATA"
 
-const identifier = "002-E"
+const identifier = "314-HE·NEOS"
 
-const callsign = "HENEOS"
+const callsign = "JOSUE HUAROTO V."
 
 const subtitle = "UNIT " <> identifier <> " // " <> callsign
 
-const summary = "A software engineer who builds reliable systems and treats
-the craft of programming as a discipline worth mastering. I care about
-correctness, clear design, and software that stays easy to change."
+const summary = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam eget magna arcu. Maecenas ut consectetur lectus. Nunc nunc est, faucibus sed nisi nec, venenatis aliquet nibh. In nisl nulla"
 
-const footer_text = "SELECT A DESTINATION TO TRANSMIT"
+const footer_tick_ms = 80
+
+const footer_reveal_chars_per_tick = 2
+
+const footer_hold_ticks = 45
+
+const scramble_characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#%*+-=?"
+
+fn fun_facts() -> List(String) {
+  [
+    "Octopuses have three hearts.",
+    "A day on Venus is longer than its year.",
+    "Wombat droppings are cube-shaped.",
+    "The dot on an i or j is called a tittle.",
+    "Bananas are berries, but strawberries are not.",
+    "A group of flamingos is called a flamboyance.",
+    "The Eiffel Tower grows slightly taller in summer.",
+    "Honey can stay edible for thousands of years when sealed.",
+  ]
+}
 
 // -----------------------------------------------------------------------------
 // Boot timing
@@ -161,13 +181,20 @@ fn boot_total_ms() -> Int {
 // -----------------------------------------------------------------------------
 
 pub type Model {
-  Model(selected: Int)
+  Model(
+    selected: Int,
+    fact_index: Int,
+    revealed_chars: Int,
+    seed: Int,
+    hold_ticks: Int,
+  )
 }
 
 pub type Message {
   UserHoveredDestination(Int)
   UserFocusedDestination(Int)
   UserLeftDestinations
+  FooterAnimationTick
 }
 
 pub fn main() {
@@ -177,18 +204,144 @@ pub fn main() {
 }
 
 fn init(_flags: Nil) -> #(Model, effect.Effect(Message)) {
-  #(Model(selected: -1), effect.none())
+  let seed = random_seed()
+  let fact_index = positive_remainder(seed, list.length(fun_facts()))
+  #(
+    Model(
+      selected: -1,
+      fact_index: fact_index,
+      revealed_chars: 0,
+      seed: seed,
+      hold_ticks: 0,
+    ),
+    effect.from(fn(dispatch) {
+      start_footer_timer(footer_tick_ms, fn() {
+        dispatch(FooterAnimationTick)
+      })
+    }),
+  )
 }
 
-fn update(_model: Model, message: Message) -> #(Model, effect.Effect(Message)) {
-  let selected = case message {
-    UserHoveredDestination(index) -> index
-    UserFocusedDestination(index) -> index
-    UserLeftDestinations -> -1
+fn update(model: Model, message: Message) -> #(Model, effect.Effect(Message)) {
+  case message {
+    UserHoveredDestination(index) -> #(with_selected(model, index), effect.none())
+    UserFocusedDestination(index) -> #(with_selected(model, index), effect.none())
+    UserLeftDestinations -> #(with_selected(model, -1), effect.none())
+    FooterAnimationTick -> #(advance_footer(model), effect.none())
   }
-
-  #(Model(selected: selected), effect.none())
 }
+
+fn with_selected(model: Model, selected: Int) -> Model {
+  Model(..model, selected: selected)
+}
+
+fn advance_footer(model: Model) -> Model {
+  let fact = fun_fact_at(fun_facts(), model.fact_index)
+  let fact_length = string.length(fact)
+  case model.revealed_chars < fact_length {
+    True ->
+      Model(
+        ..model,
+        revealed_chars: model.revealed_chars + footer_reveal_chars_per_tick,
+        seed: next_seed(model.seed),
+        hold_ticks: 0,
+      )
+    False -> advance_footer_hold(model, fact_length)
+  }
+}
+
+fn advance_footer_hold(model: Model, fact_length: Int) -> Model {
+  case model.hold_ticks < footer_hold_ticks {
+    True -> Model(..model, hold_ticks: model.hold_ticks + 1)
+    False -> {
+      let seed = next_seed(model.seed)
+      let facts = fun_facts()
+      let random_index = positive_remainder(seed, list.length(facts))
+      let next_index = case random_index == model.fact_index {
+        True -> positive_remainder(random_index + 1, list.length(facts))
+        False -> random_index
+      }
+      Model(
+        ..model,
+        fact_index: next_index,
+        revealed_chars: 0,
+        seed: next_seed(seed + fact_length),
+        hold_ticks: 0,
+      )
+    }
+  }
+}
+
+fn next_seed(seed: Int) -> Int {
+  positive_remainder(seed * 48271, 2147483647)
+}
+
+fn positive_remainder(dividend: Int, divisor: Int) -> Int {
+  int.remainder(dividend, divisor) |> result.unwrap(or: 0)
+}
+
+fn fun_fact_at(facts: List(String), index: Int) -> String {
+  case index {
+    0 -> first_fun_fact(facts)
+    _ -> fun_fact_at(list.drop(facts, 1), index - 1)
+  }
+}
+
+fn first_fun_fact(facts: List(String)) -> String {
+  case facts {
+    [fact, ..] -> fact
+    [] -> ""
+  }
+}
+
+fn displayed_fun_fact(model: Model) -> String {
+  let fact = fun_fact_at(fun_facts(), model.fact_index)
+  scramble_text(fact, model.revealed_chars, model.seed, 0, "")
+}
+
+fn scramble_text(
+  fact: String,
+  revealed_chars: Int,
+  seed: Int,
+  index: Int,
+  output: String,
+) -> String {
+  case index >= string.length(fact) {
+    True -> output
+    False -> {
+      let character = string.slice(fact, index, 1)
+      let seed = next_seed(seed)
+      let displayed_character = case index < revealed_chars {
+        True -> character
+        False -> scrambled_character(character, seed)
+      }
+      scramble_text(
+        fact,
+        revealed_chars,
+        seed,
+        index + 1,
+        output <> displayed_character,
+      )
+    }
+  }
+}
+
+fn scrambled_character(character: String, seed: Int) -> String {
+  case character == " " {
+    True -> " "
+    False -> string.slice(
+      scramble_characters,
+      positive_remainder(seed, string.length(scramble_characters)),
+      1,
+    )
+  }
+}
+
+@external(javascript, "./introduction_card_ffi.mjs", "start_footer_timer")
+fn start_footer_timer(milliseconds: Int, callback: fn() -> Nil) -> Nil
+
+@external(javascript, "./introduction_card_ffi.mjs", "random_seed")
+fn random_seed() -> Int
 
 // -----------------------------------------------------------------------------
 // View
@@ -265,7 +418,7 @@ fn page(model: Model) -> Element(Message) {
       masthead(),
       profile(),
     ]),
-    page_footer(),
+    page_footer(model),
   ])
 }
 
@@ -361,7 +514,7 @@ fn destination_item(
   )
 }
 
-fn page_footer() -> Element(Message) {
+fn page_footer(model: Model) -> Element(Message) {
   html.footer([attribute.class("nier__footer")], [
     html.div([attribute.class("nier__footer-bars")], [
       html.span(
@@ -373,7 +526,9 @@ fn page_footer() -> Element(Message) {
         [],
       ),
     ]),
-    html.span([attribute.class("nier__footer-text")], [html.text(footer_text)]),
+    html.span([attribute.class("nier__footer-text")], [
+      html.text(displayed_fun_fact(model)),
+    ]),
   ])
 }
 
