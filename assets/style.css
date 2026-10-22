@@ -607,8 +607,8 @@ body {
   margin: 0;
   color: var(--text);
   font-family: var(--description-font);
-  font-size: 1.4rem;
-  line-height: 1.8;
+  font-size: 1.3rem;
+  line-height: 1.5;
   white-space: normal;
 }
 
@@ -959,7 +959,7 @@ body {
 
   .nier__summary {
     font-size: 1rem;
-    line-height: 1.6;
+    line-height: 1.4;
   }
 
   .nier__field {

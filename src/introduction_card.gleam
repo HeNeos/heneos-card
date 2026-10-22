@@ -116,7 +116,11 @@ const callsign = "JOSUE HUAROTO V."
 
 const subtitle = "UNIT " <> identifier <> " // " <> callsign
 
-const summary = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam eget magna arcu. Maecenas ut consectetur lectus. Nunc nunc est, faucibus sed nisi nec, venenatis aliquet nibh. In nisl nulla"
+const summary = "Hi, I'm Josue.
+I'm a software engineer, at my job I primarily use rust, python and typescript.
+I'm interested on functional programming, programming languages, distributed systems, cloud architecture and cybersecurity.
+I strongly believe in strict typing and advocate for correct definitions rather than ones that are merely good.
+"
 
 const footer_tick_ms = 80
 
