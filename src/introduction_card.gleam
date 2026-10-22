@@ -128,14 +128,23 @@ const scramble_characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#%*+-=?"
 
 fn fun_facts() -> List(String) {
   [
-    "Octopuses have three hearts.",
-    "A day on Venus is longer than its year.",
-    "Wombat droppings are cube-shaped.",
-    "The dot on an i or j is called a tittle.",
-    "Bananas are berries, but strawberries are not.",
-    "A group of flamingos is called a flamboyance.",
-    "The Eiffel Tower grows slightly taller in summer.",
-    "Honey can stay edible for thousands of years when sealed.",
+    "For the love of types",
+    "\"Amar es sufrir, querer es gozar\"",
+    "Dennis is the wolf-man bitten by the wizard from Siam",
+    "Glory to the Gabibbo",
+    "What will happen? What mystery might there be? It could be my big night",
+    "A monad is just a monoid in the category of endofunctors",
+    "Information is here, here and everywhere",
+    "Nix fixes this",
+    "Because you were shining for me too, I kept going forward",
+    "HERO wa kanarazu katsu!",
+    "Isn't this world a tad boring? Or perhaps hadn't I gave it my all yet?",
+    "Grammar, which knows how to control even kings",
+    "Maybe if I keep believing my dreams will come to life",
+    "All my life, my heart has yearned for a thing I cannot name",
+    "And you don't seem to understand, a shame you seemed an honest man",
+    "I have committed the worst of the sins that a man can commit. I have introduced a side effect",
+    "Unfortunately, I'm very much human. I'm willing to sacrifice my life to protect what's dear to me",
   ]
 }
 

@@ -804,7 +804,7 @@ body {
   min-width: 0;
   color: var(--text-dim);
   font-family: var(--footer-font);
-  font-size: clamp(0.95rem, 1.9vw, 1.5rem);
+  font-size: clamp(0.85rem, 1.7vw, 1.35rem);
   letter-spacing: 0.24em;
   line-height: 1.5;
   overflow-wrap: anywhere;
